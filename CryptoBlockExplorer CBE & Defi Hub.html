@@ -1,0 +1,434 @@
+<html><head><base href="https://crypto-block-explorer.com/">
+<title>Crypto Block Explorer & DeFi Hub</title>
+<style>
+  body {
+    background-color: #000000;
+    color: #e0e0e0;
+    font-family: 'Rajdhani', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 1800px;
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .section {
+    background: linear-gradient(145deg, #2a2a2a, #1c1c1c);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    width: 100%;
+  }
+  .section:hover {
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.1);
+  }
+  .block-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  .block {
+    text-align: center;
+    background: linear-gradient(145deg, #2d2d2d, #1f1f1f);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    width: 280px;
+  }
+  .block:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(255, 255, 255, 0.05);
+  }
+  .crypto-name, .defi-name, .nft-name {
+    font-size: 1.2em;
+    color: #c0c0c0;
+    text-shadow: 0 0 10px rgba(192, 192, 192, 0.5);
+  }
+  .block-info, .defi-info, .nft-info {
+    font-size: 0.9em;
+    color: #a0a0a0;
+  }
+  .price, .tvl, .floor-price {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #d4af37;
+  }
+  h1, h2 {
+    color: #c0c0c0;
+    text-shadow: 0 0 15px rgba(192, 192, 192, 0.5);
+    position: relative;
+    z-index: 1;
+  }
+  h1 { font-size: 3em; margin-bottom: 20px; }
+  h2 { font-size: 2em; margin-bottom: 15px; }
+  #searchInput {
+    background: linear-gradient(145deg, #2a2a2a, #1c1c1c);
+    border: 1px solid #3a3a3a;
+    color: #e0e0e0;
+    padding: 10px;
+    font-size: 1em;
+    margin-bottom: 20px;
+    width: 300px;
+    font-family: 'Rajdhani', sans-serif;
+    border-radius: 5px;
+    position: relative;
+    z-index: 1;
+  }
+  #loading {
+    font-size: 1.5em;
+    margin-top: 20px;
+    color: #c0c0c0;
+    position: relative;
+    z-index: 1;
+  }
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .pagination button {
+    background: linear-gradient(145deg, #2a2a2a, #1c1c1c);
+    border: 1px solid #3a3a3a;
+    color: #e0e0e0;
+    padding: 10px 20px;
+    margin: 0 5px;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+  }
+  .pagination button:hover {
+    background: linear-gradient(145deg, #3a3a3a, #2c2c2c);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  }
+  #matrix-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+  .nft-link {
+    color: #d4af37;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  .nft-link:hover {
+    color: #ffd700;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  }
+  #app-info {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(145deg, #2a2a2a, #1c1c1c);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    max-width: 250px;
+    font-size: 0.9em;
+    color: #a0a0a0;
+  }
+  #app-info h3 {
+    color: #d4af37;
+    margin-top: 0;
+  }
+  #bitcoin-block-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(145deg, #2a2a2a, #1c1c1c);
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    max-width: 300px;
+    font-size: 0.9em;
+    color: #a0a0a0;
+    display: none;
+  }
+  #bitcoin-block-notification h4 {
+    color: #d4af37;
+    margin-top: 0;
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<canvas id="matrix-bg"></canvas>
+<div id="app-info">
+  <h3>Crypto Block Explorer & DeFi Hub</h3>
+  <p>Real-time cryptocurrency data, blockchain insights, and DeFi project information. Explore the latest in crypto, NFTs, and decentralized finance.</p>
+</div>
+<div id="bitcoin-block-notification">
+  <h4>New Bitcoin Block Discovered!</h4>
+  <p>Block #<span id="block-number"></span> has just been mined.</p>
+</div>
+<h1>Crypto Block Explorer & DeFi Hub</h1>
+<input type="text" id="searchInput" placeholder="Search for a cryptocurrency...">
+<div id="loading">Loading blockchain data...</div>
+<div class="container">
+  <div class="section">
+    <h2>Top Cryptocurrencies</h2>
+    <div class="block-container" id="cryptoContainer"></div>
+    <div class="pagination">
+      <button id="prevPage">Previous</button>
+      <button id="nextPage">Next</button>
+    </div>
+  </div>
+  <div class="section">
+    <h2>Top DeFi Projects</h2>
+    <div class="block-container" id="defiContainer"></div>
+  </div>
+  <div class="section">
+    <h2>Top NFTs</h2>
+    <div class="block-container" id="nftContainer"></div>
+  </div>
+</div>
+
+<script>
+let allCryptos = [];
+let displayedCryptos = [];
+let currentPage = 1;
+const itemsPerPage = 20;
+
+async function fetchData() {
+  try {
+    const [cryptoResponse, defiResponse] = await Promise.all([
+      fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=300&page=1&sparkline=false'),
+      fetch('https://api.coingecko.com/api/v3/global/decentralized_finance_defi')
+    ]);
+
+    const cryptoData = await cryptoResponse.json();
+    const defiData = await defiResponse.json();
+
+    allCryptos = cryptoData.map(crypto => ({
+      id: crypto.id,
+      symbol: crypto.symbol.toUpperCase(),
+      name: crypto.name,
+      price: crypto.current_price
+    }));
+    displayedCryptos = [...allCryptos];
+
+    initializeCryptos();
+    initializeDefi(defiData.data);
+    initializeNFTs();
+
+    document.getElementById('loading').style.display = 'none';
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
+
+function createCryptoBlock(crypto) {
+  const blockDiv = document.createElement('div');
+  blockDiv.className = 'block';
+  blockDiv.innerHTML = `
+    <div class="crypto-name">${crypto.name} (${crypto.symbol})</div>
+    <div class="block-info" id="${crypto.symbol}RecentBlock">Recent Block: ${Math.floor(Math.random() * 1000000)}</div>
+    <div class="block-info" id="${crypto.symbol}UpcomingBlock">Upcoming Block: ${Math.floor(Math.random() * 1000000)}</div>
+    <div class="price" id="${crypto.symbol}Price">Price: $${crypto.price.toFixed(2)}</div>
+  `;
+  return blockDiv;
+}
+
+function displayCryptos() {
+  const cryptoContainer = document.getElementById('cryptoContainer');
+  cryptoContainer.innerHTML = '';
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const pageItems = displayedCryptos.slice(start, end);
+  pageItems.forEach(crypto => cryptoContainer.appendChild(createCryptoBlock(crypto)));
+}
+
+function initializeCryptos() {
+  displayCryptos();
+  updatePaginationButtons();
+}
+
+function updatePaginationButtons() {
+  const prevButton = document.getElementById('prevPage');
+  const nextButton = document.getElementById('nextPage');
+  prevButton.disabled = currentPage === 1;
+  nextButton.disabled = currentPage === Math.ceil(displayedCryptos.length / itemsPerPage);
+}
+
+document.getElementById('prevPage').addEventListener('click', () => {
+  if (currentPage > 1) {
+    currentPage--;
+    displayCryptos();
+    updatePaginationButtons();
+  }
+});
+
+document.getElementById('nextPage').addEventListener('click', () => {
+  if (currentPage < Math.ceil(displayedCryptos.length / itemsPerPage)) {
+    currentPage++;
+    displayCryptos();
+    updatePaginationButtons();
+  }
+});
+
+function initializeDefi(defiData) {
+  const defiContainer = document.getElementById('defiContainer');
+  const topDefiProjects = [
+    { name: "Aave", tvl: defiData.defi_market_cap * 0.1 },
+    { name: "Maker", tvl: defiData.defi_market_cap * 0.09 },
+    { name: "Compound", tvl: defiData.defi_market_cap * 0.08 },
+    { name: "Uniswap", tvl: defiData.defi_market_cap * 0.07 },
+    { name: "Curve", tvl: defiData.defi_market_cap * 0.06 }
+  ];
+
+  topDefiProjects.forEach(project => {
+    const defiBlock = document.createElement('div');
+    defiBlock.className = 'block';
+    defiBlock.innerHTML = `
+      <div class="defi-name">${project.name}</div>
+      <div class="defi-info">Total Value Locked</div>
+      <div class="tvl">$${project.tvl.toFixed(2)}</div>
+    `;
+    defiContainer.appendChild(defiBlock);
+  });
+}
+
+function initializeNFTs() {
+  const nftContainer = document.getElementById('nftContainer');
+  const nftMarketplaces = [
+    { name: "Ordinals Wallet", url: "https://ordinalswallet.com" },
+    { name: "Magic Eden", url: "https://magiceden.io" },
+    { name: "OpenSea", url: "https://opensea.io" },
+    { name: "Tensor", url: "https://www.tensor.trade" },
+    { name: "Rarible", url: "https://rarible.com" },
+    { name: "Doggy Market", url: "https://doggy.market" },
+    { name: "DRC-20", url: "https://drc-20.org" },
+    { name: "Gamma", url: "https://gamma.io" }
+  ];
+
+  nftMarketplaces.forEach(marketplace => {
+    const nftBlock = document.createElement('div');
+    nftBlock.className = 'block';
+    nftBlock.innerHTML = `
+      <div class="nft-name">${marketplace.name}</div>
+      <div class="nft-info">
+        <a href="${marketplace.url}" target="_blank" rel="noopener noreferrer" class="nft-link">View Latest NFTs</a>
+      </div>
+    `;
+    nftContainer.appendChild(nftBlock);
+  });
+}
+
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', function() {
+  const searchTerm = this.value.toLowerCase();
+  if (searchTerm === '') {
+    displayedCryptos = [...allCryptos];
+  } else {
+    displayedCryptos = allCryptos.filter(crypto => 
+      crypto.name.toLowerCase().includes(searchTerm) || 
+      crypto.symbol.toLowerCase().includes(searchTerm)
+    );
+  }
+  currentPage = 1;
+  displayCryptos();
+  updatePaginationButtons();
+});
+
+// Matrix background effect with silver color
+const canvas = document.getElementById('matrix-bg');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const nums = '0123456789';
+
+const alphabet = katakana + latin + nums;
+
+const fontSize = 16;
+const columns = canvas.width / fontSize;
+
+const rainDrops = [];
+
+for (let x = 0; x < columns; x++) {
+  rainDrops[x] = 1;
+}
+
+function draw() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = 'rgba(192, 192, 192, 0.8)'; // Silver color
+  ctx.font = fontSize + 'px monospace';
+
+  for (let i = 0; i < rainDrops.length; i++) {
+    const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+    ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+
+    if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+      rainDrops[i] = 0;
+    }
+    rainDrops[i]++;
+  }
+}
+
+setInterval(draw, 30);
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+// Simulating Bitcoin block discovery without screen shake
+function simulateBitcoinBlockDiscovery() {
+  const averageBlockTime = 10 * 60 * 1000; // 10 minutes in milliseconds
+  const variance = 5 * 60 * 1000; // 5 minutes variance
+
+  let blockNumber = 740000; // Starting from an arbitrary block number
+
+  function discoverBlock() {
+    blockNumber++;
+    const notification = document.getElementById('bitcoin-block-notification');
+    const blockNumberSpan = document.getElementById('block-number');
+    blockNumberSpan.textContent = blockNumber;
+    notification.style.display = 'block';
+    
+    setTimeout(() => {
+      notification.style.display = 'none';
+    }, 5000); // Hide notification after 5 seconds
+
+    const nextBlockTime = averageBlockTime + (Math.random() * 2 - 1) * variance;
+    setTimeout(discoverBlock, nextBlockTime);
+  }
+
+  // Start the simulation
+  discoverBlock();
+}
+
+window.onload = () => {
+  fetchData();
+  simulateBitcoinBlockDiscovery();
+};
+</script>
+</body>
+</html>
